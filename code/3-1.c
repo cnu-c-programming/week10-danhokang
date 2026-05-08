@@ -1,31 +1,89 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-struct IPv4 {
-    unsigned int version;
-    unsigned int ihl;
-    unsigned long long ttl;
-    unsigned long long protocol;
-    unsigned char data[1024];
+struct Student {
+    char name[100];
+    int score;
+    struct Student *next;
 };
 
-void update_val(struct IPv4 s) {
-    sprintf((char *)s.data, "update_val");
-}
-
-void update_ptr(struct IPv4 *s) {
-    sprintf((char *)s->data, "update_ptr");
-}
-
 int main() {
-    struct IPv4 s1 = {0};
-    struct IPv4 s2 = {0};
+    struct Student *head = NULL;
+    char command[20];
 
-    update_val(s1);
-    update_ptr(&s2);
+    while (1) {
+        scanf("%s", command);
 
-    printf("%s\n", s1.data);
-    printf("%s\n", s2.data);
+        if (strcmp(command, "add") == 0) {
+            char name[100];
+            int score;
+
+            scanf("%s %d", name, &score);
+
+            struct Student *new_node = (struct Student *)malloc(sizeof(struct Student));
+            strcpy(new_node->name, name);
+            new_node->score = score;
+            new_node->next = NULL;
+
+            if (head == NULL) {
+                head = new_node;
+            } else {
+                struct Student *cur = head;
+
+                while (cur->next != NULL) {
+                    cur = cur->next;
+                }
+
+                cur->next = new_node;
+            }
+        }
+
+        else if (strcmp(command, "delete") == 0) {
+            char name[100];
+            scanf("%s", name);
+
+            struct Student *cur = head;
+            struct Student *prev = NULL;
+
+            while (cur != NULL) {
+                if (strcmp(cur->name, name) == 0) {
+                    if (prev == NULL) {
+                        head = cur->next;
+                    } else {
+                        prev->next = cur->next;
+                    }
+
+                    free(cur);
+                    break;
+                }
+
+                prev = cur;
+                cur = cur->next;
+            }
+        }
+
+        else if (strcmp(command, "print") == 0) {
+            struct Student *cur = head;
+
+            while (cur != NULL) {
+                printf("%s %d\n", cur->name, cur->score);
+                cur = cur->next;
+            }
+        }
+
+        else if (strcmp(command, "quit") == 0) {
+            struct Student *cur = head;
+
+            while (cur != NULL) {
+                struct Student *temp = cur;
+                cur = cur->next;
+                free(temp);
+            }
+
+            break;
+        }
+    }
 
     return 0;
 }
